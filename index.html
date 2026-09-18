@@ -1,946 +1,1507 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <meta charset="UTF-8">
+  <title>Under25 Invoice Generator</title>
 
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <meta name="theme-color" content="#D60B2A">
+  <style>
+    * {
+      box-sizing: border-box;
+    }
 
-    <meta
-        name="apple-mobile-web-app-capable"
-        content="yes">
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f5f5f5;
+      color: #111;
+    }
 
-    <meta
-        name="apple-mobile-web-app-status-bar-style"
-        content="black-translucent">
+    .container {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px 20px 60px;
+    }
 
-    <title>Invoice Generator | Under25</title>
+    .header {
+      margin-bottom: 25px;
+    }
 
-    <link
-        rel="stylesheet"
-        href="../css/invoice-gen.css">
+    .header h1 {
+      margin: 0 0 5px;
+      font-size: 30px;
+    }
 
+    .header p {
+      margin: 0;
+      color: #666;
+    }
+
+    .card {
+      background: white;
+      border-radius: 14px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 3px 15px rgba(0,0,0,0.06);
+    }
+
+    .card h2 {
+      margin: 0 0 20px;
+      font-size: 20px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 7px;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 12px 13px;
+      border: 1px solid #d5d5d5;
+      border-radius: 8px;
+      font-size: 15px;
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: #111;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 90px;
+    }
+
+    .rate-box {
+      background: #f7f7f7;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      margin-top: 7px;
+    }
+
+    .rate-box strong {
+      font-size: 17px;
+    }
+
+    .signature-preview {
+      margin-top: 10px;
+      max-width: 220px;
+      max-height: 100px;
+      display: none;
+      object-fit: contain;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 5px;
+    }
+
+    .error {
+      color: #d00;
+      font-size: 12px;
+      margin-top: 5px;
+      min-height: 15px;
+    }
+
+    .button {
+      width: 100%;
+      border: none;
+      background: #111;
+      color: white;
+      padding: 15px;
+      border-radius: 9px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+
+    .secondary-button {
+      border: 1px solid #111;
+      background: white;
+      color: #111;
+    }
+
+    /* PREVIEW */
+
+    #previewSection {
+      display: none;
+    }
+
+    .preview-wrapper {
+      overflow-x: auto;
+      padding: 10px 0;
+    }
+
+    #invoice {
+      width: 794px;
+      min-height: 1123px;
+      background: white;
+      margin: 0 auto;
+      padding: 50px;
+      position: relative;
+      color: #111;
+    }
+
+    .invoice-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 30px;
+      border-bottom: 2px solid #111;
+      padding-bottom: 25px;
+    }
+
+    .invoice-brand h1 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .invoice-brand p {
+      margin: 5px 0 0;
+      color: #666;
+    }
+
+    .invoice-title {
+      text-align: right;
+    }
+
+    .invoice-title h2 {
+      margin: 0;
+      font-size: 30px;
+    }
+
+    .invoice-title p {
+      margin: 7px 0 0;
+      font-size: 13px;
+    }
+
+    .invoice-section {
+      margin-top: 30px;
+    }
+
+    .invoice-section-title {
+      font-size: 12px;
+      font-weight: bold;
+      text-transform: uppercase;
+      color: #777;
+      margin-bottom: 8px;
+    }
+
+    .invoice-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+    }
+
+    .invoice-details p {
+      margin: 4px 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .invoice-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    .invoice-table th {
+      background: #111;
+      color: white;
+      text-align: left;
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    .invoice-table td {
+      padding: 14px 12px;
+      border-bottom: 1px solid #ddd;
+      font-size: 14px;
+    }
+
+    .text-right {
+      text-align: right !important;
+    }
+
+    .total-box {
+      width: 300px;
+      margin-left: auto;
+      margin-top: 20px;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 8px 0;
+      font-size: 14px;
+    }
+
+    .grand-total {
+      border-top: 2px solid #111;
+      margin-top: 5px;
+      padding-top: 12px;
+      font-size: 19px;
+      font-weight: bold;
+    }
+
+    .bank-section {
+      margin-top: 45px;
+      padding-top: 20px;
+      border-top: 1px solid #ddd;
+    }
+
+    .bank-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 30px;
+    }
+
+    .bank-grid p {
+      margin: 4px 0;
+      font-size: 13px;
+    }
+
+    .signature-area {
+      margin-top: 50px;
+      text-align: right;
+    }
+
+    .signature-area img {
+      max-width: 180px;
+      max-height: 80px;
+      object-fit: contain;
+      display: block;
+      margin-left: auto;
+      margin-bottom: 5px;
+    }
+
+    .signature-line {
+      border-top: 1px solid #111;
+      width: 180px;
+      margin-left: auto;
+      padding-top: 7px;
+      font-size: 12px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .action-buttons button {
+      flex: 1;
+    }
+
+    .loading {
+      text-align: center;
+      color: #666;
+      padding: 20px;
+    }
+
+    @media (max-width: 650px) {
+      .container {
+        padding: 20px 12px 40px;
+      }
+
+      .card {
+        padding: 18px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .full {
+        grid-column: auto;
+      }
+
+      .header h1 {
+        font-size: 24px;
+      }
+
+      .action-buttons {
+        flex-direction: column;
+      }
+
+      .preview-wrapper {
+        overflow-x: hidden;
+      }
+
+      #invoice {
+        width: 100%;
+        min-height: auto;
+        padding: 25px 18px;
+      }
+
+      .invoice-top {
+        flex-direction: column;
+        gap: 20px;
+      }
+
+      .invoice-title {
+        text-align: left;
+      }
+
+      .invoice-title h2 {
+        font-size: 25px;
+      }
+
+      .invoice-details {
+        grid-template-columns: 1fr;
+        gap: 18px;
+      }
+
+      .invoice-table {
+        font-size: 12px;
+      }
+
+      .invoice-table th,
+      .invoice-table td {
+        padding: 9px 6px;
+      }
+
+      .total-box {
+        width: 100%;
+      }
+
+      .bank-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .signature-area {
+        text-align: left;
+      }
+
+      .signature-area img,
+      .signature-line {
+        margin-left: 0;
+      }
+    }
+  </style>
 </head>
-
 
 <body>
 
-    <!-- =====================================================
-         FORM PAGE
-    ====================================================== -->
+<div class="container">
 
-    <main
-        id="formPage"
-        class="invoice-generator-page">
+  <div class="header">
+    <h1>Invoice Generator</h1>
+    <p>Generate your invoice in a few simple steps.</p>
+  </div>
 
-        <div class="generator-card">
+  <!-- FORM -->
 
-            <div class="generator-header">
+  <div id="formSection">
 
-                <div class="brand-mark">
-                    Under25
-                </div>
+    <div class="card">
+      <h2>1. Personal Details</h2>
 
-                <h1>
-                    Invoice Generator
-                </h1>
+      <div class="grid">
+
+        <div>
+          <label>Name</label>
+          <input type="text" id="name" placeholder="Enter your name">
+          <div class="error" id="nameError"></div>
+        </div>
+
+        <div>
+          <label>Number</label>
+          <input
+            type="tel"
+            id="phone"
+            placeholder="10-digit mobile number"
+            maxlength="10"
+          >
+          <div class="error" id="phoneError"></div>
+        </div>
+
+        <div>
+          <label>Email</label>
+          <input
+            type="email"
+            id="email"
+            placeholder="Enter your email"
+          >
+          <div class="error" id="emailError"></div>
+        </div>
+
+        <div class="full">
+          <label>Billing Address</label>
+          <textarea
+            id="address"
+            placeholder="Enter your complete billing address"
+          ></textarea>
+          <div class="error" id="addressError"></div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="card">
+      <h2>2. Campaign Details</h2>
+
+      <div class="grid">
+
+        <div class="full">
+          <label>Campaign / Particulars</label>
+
+          <select id="campaign">
+            <option value="">Loading campaigns...</option>
+          </select>
+
+          <div class="error" id="campaignError"></div>
+
+          <div class="rate-box">
+            Rate:
+            <strong id="rateDisplay">₹0</strong>
+          </div>
+        </div>
+
+        <div>
+          <label>Quantity</label>
+          <input
+            type="number"
+            id="qty"
+            min="1"
+            placeholder="Enter quantity"
+          >
+          <div class="error" id="qtyError"></div>
+        </div>
+
+        <div>
+          <label>Calculated Amount</label>
+          <input
+            type="text"
+            id="calculatedAmount"
+            value="₹0"
+            readonly
+          >
+        </div>
+
+        <div>
+          <label>Billing Date</label>
+          <input type="date" id="billingDate">
+          <div class="error" id="dateError"></div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="card">
+      <h2>3. Bank Details</h2>
+
+      <div class="grid">
+
+        <div>
+          <label>PAN Card</label>
+          <input
+            type="text"
+            id="pan"
+            maxlength="10"
+            placeholder="ABCDE1234F"
+            style="text-transform: uppercase;"
+          >
+          <div class="error" id="panError"></div>
+        </div>
+
+        <div>
+          <label>Bank Name</label>
+          <input
+            type="text"
+            id="bankName"
+            placeholder="Enter bank name"
+          >
+          <div class="error" id="bankNameError"></div>
+        </div>
+
+        <div>
+          <label>Bank Account Number</label>
+          <input
+            type="text"
+            id="accountNumber"
+            inputmode="numeric"
+            placeholder="Enter account number"
+          >
+          <div class="error" id="accountError"></div>
+        </div>
+
+        <div>
+          <label>IFSC Code</label>
+          <input
+            type="text"
+            id="ifsc"
+            maxlength="11"
+            placeholder="SBIN0001234"
+            style="text-transform: uppercase;"
+          >
+          <div class="error" id="ifscError"></div>
+        </div>
+
+      </div>
+    </div>
+
+
+    <div class="card">
+      <h2>4. Signature</h2>
+
+      <label>Upload Signature</label>
+
+      <input
+        type="file"
+        id="signature"
+        accept="image/png,image/jpeg,image/jpg,image/webp"
+      >
+
+      <img
+        id="signaturePreview"
+        class="signature-preview"
+      >
+
+      <div class="error" id="signatureError"></div>
+    </div>
+
+
+    <div class="card">
+      <button class="button" onclick="generateInvoice()">
+        Generate Invoice
+      </button>
+    </div>
+
+  </div>
+
+
+  <!-- PREVIEW -->
+
+  <div id="previewSection">
+
+    <div class="card">
+      <h2>Invoice Preview</h2>
+
+      <div class="preview-wrapper">
+
+        <div id="invoice">
+
+          <div class="invoice-top">
+
+            <div class="invoice-brand">
+              <h1>Under25</h1>
+              <p>Invoice</p>
+            </div>
+
+            <div class="invoice-title">
+              <h2>INVOICE</h2>
+              <p id="previewDate"></p>
+            </div>
+
+          </div>
+
+
+          <div class="invoice-section">
+
+            <div class="invoice-details">
+
+            <div>
+  <div class="invoice-section-title">
+    Billed To
+  </div>
+
+  <p>
+    <strong>Collective Artists Network India Pvt Ltd</strong>
+  </p>
+
+  <p>
+    5th Floor, Lotus Business Park,<br>
+    New Link Road, Andheri West,<br>
+    Mumbai, Maharashtra – 400053
+  </p>
+
+  <p>
+    <strong>PAN:</strong> AAHCP2434K
+  </p>
+
+  <p>
+    <strong>GSTIN:</strong> 27AAHCP2434K1Z9
+  </p>
+</div>
 
                 <p>
-                    Create your invoice in a few simple steps.
+                  <strong id="previewName"></strong>
                 </p>
+
+        
+              </div>
+
+              <div>
+                <div class="invoice-section-title">
+                  Payment Details
+                </div>
+
+                <p>
+                  <strong>PAN:</strong>
+                  <span id="previewPan"></span>
+                </p>
+
+                <p>
+                  <strong>Bank:</strong>
+                  <span id="previewBank"></span>
+                </p>
+
+                <p>
+                  <strong>Account:</strong>
+                  <span id="previewAccount"></span>
+                </p>
+
+                <p>
+                  <strong>IFSC:</strong>
+                  <span id="previewIfsc"></span>
+                </p>
+              </div>
 
             </div>
 
-
-            <form
-                id="invoiceForm"
-                novalidate>
+          </div>
 
 
-                <!-- =================================================
-                     INVOICE DETAILS
-                ================================================== -->
+          <div class="invoice-section">
 
-                <section class="form-section">
+            <table class="invoice-table">
 
-                    <div class="section-heading">
+              <thead>
+                <tr>
+                  <th>Particulars</th>
+                  <th class="text-right">Qty</th>
+                  <th class="text-right">Rate</th>
+                  <th class="text-right">Amount</th>
+                </tr>
+              </thead>
 
-                        <span class="section-number">
-                            01
-                        </span>
+              <tbody>
 
-                        <div>
-                            <h2>
-                                Invoice Details
-                            </h2>
+                <tr>
+                  <td id="previewCampaign"></td>
+                  <td class="text-right" id="previewQty"></td>
+                  <td class="text-right" id="previewRate"></td>
+                  <td class="text-right" id="previewAmount"></td>
+                </tr>
 
-                            <p>
-                                Enter the basic invoice information.
-                            </p>
-                        </div>
+              </tbody>
 
-                    </div>
+            </table>
 
 
-                    <div class="form-grid two-columns">
+            <div class="total-box">
 
-                     <div class="input-group">
+              <div class="total-row">
+                <span>Subtotal</span>
+                <span id="previewSubtotal"></span>
+              </div>
 
-    <label for="invoiceDate">
-        Invoice Date
-    </label>
+              <div class="total-row grand-total">
+                <span>Total</span>
+                <span id="previewTotal"></span>
+              </div>
 
-    <div class="date-input-wrapper">
+            </div>
 
-        <input
-            id="invoiceDateDisplay"
-            type="text"
-            placeholder="Select invoice date"
-            readonly
-            aria-label="Invoice Date">
+          </div>
 
-        <span class="date-icon">
-            📅
-        </span>
 
-        <input
-            id="invoiceDate"
-            name="invoiceDate"
-            type="date"
-            required
-            aria-hidden="true"
-            tabindex="-1">
+          <div class="bank-section">
+
+            <div class="invoice-section-title">
+              Bank Details
+            </div>
+
+            <div class="bank-grid">
+
+              <p>
+                <strong>Bank:</strong>
+                <span id="previewBank2"></span>
+              </p>
+
+              <p>
+                <strong>Account:</strong>
+                <span id="previewAccount2"></span>
+              </p>
+
+              <p>
+                <strong>IFSC:</strong>
+                <span id="previewIfsc2"></span>
+              </p>
+
+              <p>
+                <strong>PAN:</strong>
+                <span id="previewPan2"></span>
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="signature-area">
+
+            <img id="previewSignature">
+
+            <div class="signature-line">
+              Authorized Signature
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="action-buttons">
+
+        <button
+          class="button secondary-button"
+          onclick="editInvoice()"
+        >
+          Edit
+        </button>
+
+        <button
+          class="button"
+          onclick="downloadPDF()"
+        >
+          Download PDF
+        </button>
+
+      </div>
 
     </div>
 
-    <div class="error-message"></div>
+  </div>
 
 </div>
 
 
-                        <div class="input-group">
+<script>
 
-                            <label for="invoiceItem">
-                                Item & Description
-                            </label>
+let campaigns = [];
+let signatureData = "";
 
-                            <select
-                                id="invoiceItem"
-                                name="invoiceItem"
-                                required>
 
-                                <option value="">
-                                    Select an item
-                                </option>
+/* =========================
+   LOAD CAMPAIGNS
+========================= */
 
-                                <option value="Notta Sin Campaign">
-                                    Professional Fees for UGC Reel: Notta Sin Campaign
-                                </option>
+async function loadCampaigns() {
 
-                            <div class="error-message"></div>
+  const select = document.getElementById("campaign");
 
-                        </div>
+  try {
 
-                    </div>
+    const response = await fetch("/api/campaigns");
 
+    if (!response.ok) {
+      throw new Error("Failed");
+    }
 
-                    <div
-                        id="customItemWrapper"
-                        class="input-group hidden">
+    campaigns = await response.json();
 
-                        <label for="customItem">
-                            Custom Item & Description
-                        </label>
+    select.innerHTML =
+      '<option value="">Select campaign</option>';
 
-                        <input
-                            id="customItem"
-                            type="text"
-                            maxlength="80"
-                            placeholder="Enter item description">
+    campaigns.forEach((campaign, index) => {
 
-                        <div class="error-message"></div>
+      const option = document.createElement("option");
 
-                    </div>
+      option.value = index;
 
+      option.textContent = campaign.name;
 
-                    <div class="form-grid two-columns">
+      select.appendChild(option);
 
-                        <div class="input-group">
+    });
 
-                            <label for="unitPrice">
-                                Amount (₹)
-                            </label>
+  } catch (error) {
 
-                            <input
-                                id="unitPrice"
-                                name="unitPrice"
-                                type="number"
-                                min="0.01"
-                                step="0.01"
-                                inputmode="decimal"
-                                placeholder="Enter amount"
-                                required>
+    select.innerHTML =
+      '<option value="">Unable to load campaigns</option>';
 
-                            <div class="error-message"></div>
+  }
 
-                        </div>
+}
 
 
-                        <div class="input-group">
+loadCampaigns();
 
-                            <label for="quantity">
-                                Quantity
-                            </label>
 
-                            <input
-                                id="quantity"
-                                name="quantity"
-                                type="number"
-                                min="1"
-                                step="1"
-                                inputmode="numeric"
-                                placeholder="Enter quantity"
-                                required>
+/* =========================
+   CAMPAIGN RATE
+========================= */
 
-                            <div class="error-message"></div>
+document
+  .getElementById("campaign")
+  .addEventListener("change", updateAmount);
 
-                        </div>
+document
+  .getElementById("qty")
+  .addEventListener("input", updateAmount);
 
-                    </div>
 
-                </section>
+function updateAmount() {
 
+  const campaignIndex =
+    document.getElementById("campaign").value;
 
+  const qty =
+    Number(document.getElementById("qty").value) || 0;
 
-                <!-- =================================================
-                     CREATOR DETAILS
-                ================================================== -->
+  if (
+    campaignIndex === "" ||
+    !campaigns[campaignIndex]
+  ) {
 
-                <section class="form-section">
+    document.getElementById("rateDisplay").textContent =
+      "₹0";
 
-                    <div class="section-heading">
+    document.getElementById("calculatedAmount").value =
+      "₹0";
 
-                        <span class="section-number">
-                            02
-                        </span>
+    return;
+  }
 
-                        <div>
-                            <h2>
-                                Your Details
-                            </h2>
 
-                            <p>
-                                These details will appear on the invoice.
-                            </p>
-                        </div>
+  const rate =
+    Number(campaigns[campaignIndex].rate);
 
-                    </div>
+  const total =
+    qty * rate;
 
 
-                    <div class="input-group">
+  document.getElementById("rateDisplay").textContent =
+    formatCurrency(rate);
 
-                        <label for="creatorName">
-                            Name
-                        </label>
+  document.getElementById("calculatedAmount").value =
+    formatCurrency(total);
 
-                        <input
-                            id="creatorName"
-                            name="creatorName"
-                            type="text"
-                            autocomplete="name"
-                            placeholder="Enter your full name"
-                            required>
+}
 
-                        <div class="error-message"></div>
 
-                    </div>
+function formatCurrency(amount) {
 
+  return "₹" +
+    Number(amount).toLocaleString("en-IN", {
+      maximumFractionDigits: 2
+    });
 
-                    <div class="input-group">
+}
 
-                        <label for="creatorAddress">
-                            Address
-                        </label>
 
-                        <textarea
-                            id="creatorAddress"
-                            name="creatorAddress"
-                            rows="3"
-                            maxlength="180"
-                            autocomplete="street-address"
-                            placeholder="Enter your address"
-                            required></textarea>
+/* =========================
+   SIGNATURE
+========================= */
 
-                        <div class="error-message"></div>
+document
+  .getElementById("signature")
+  .addEventListener("change", function(event) {
 
-                    </div>
+    const file = event.target.files[0];
 
+    if (!file) return;
 
-                    <div class="form-grid two-columns">
 
-                        <div class="input-group">
+    if (!file.type.startsWith("image/")) {
 
-                            <label for="creatorPhone">
-    Number
-</label>
+      document.getElementById("signatureError").textContent =
+        "Please upload an image only.";
 
-<input
-    id="creatorPhone"
-    name="creatorPhone"
-    type="tel"
-    inputmode="numeric"
-    autocomplete="tel"
-    maxlength="10"
-    placeholder="10-digit mobile number"
-    required>
+      return;
 
-                            <div class="error-message"></div>
+    }
 
-                        </div>
 
+    const reader = new FileReader();
 
-                        <div class="input-group">
+    reader.onload = function(e) {
 
-                           <label for="creatorEmail">
-    Email
-</label>
+      signatureData = e.target.result;
 
-<input
-    id="creatorEmail"
-    name="creatorEmail"
-    type="email"
-    autocomplete="email"
-    placeholder="you@example.com"
-    required>
+      const preview =
+        document.getElementById("signaturePreview");
 
-                            <div class="error-message"></div>
+      preview.src = signatureData;
 
-                        </div>
+      preview.style.display = "block";
 
-                    </div>
+    };
 
-                </section>
+    reader.readAsDataURL(file);
 
+  });
 
 
-                <!-- =================================================
-                     PAYMENT DETAILS
-                ================================================== -->
+/* =========================
+   VALIDATION
+========================= */
 
-                <section class="form-section">
+function clearErrors() {
 
-                    <div class="section-heading">
+  document
+    .querySelectorAll(".error")
+    .forEach(el => el.textContent = "");
 
-                        <span class="section-number">
-                            03
-                        </span>
+}
 
-                        <div>
-                            <h2>
-                                Payment Details
-                            </h2>
 
-                            <p>
-                                Enter the bank details that should appear on the invoice.
-                            </p>
-                        </div>
+function validateForm() {
 
-                    </div>
+  clearErrors();
 
+  let valid = true;
 
-                    <div class="input-group">
 
-                        <label for="bankName">
-                            Bank
-                        </label>
+  const name =
+    document.getElementById("name").value.trim();
 
-                        <input
-                            id="bankName"
-                            name="bankName"
-                            type="text"
-                            autocomplete="organization"
-                            placeholder="Enter bank name"
-                            required>
+  const phone =
+    document.getElementById("phone").value.trim();
 
-                        <div class="error-message"></div>
+  const email =
+    document.getElementById("email").value.trim();
 
-                    </div>
+  const address =
+    document.getElementById("address").value.trim();
 
+  const campaign =
+    document.getElementById("campaign").value;
 
-                    <div class="input-group">
+  const qty =
+    Number(document.getElementById("qty").value);
 
-                        <label for="accountName">
-                            Account Name
-                        </label>
+  const billingDate =
+    document.getElementById("billingDate").value;
 
-                        <input
-                            id="accountName"
-                            name="accountName"
-                            type="text"
-                            autocomplete="name"
-                            placeholder="Name as per bank account"
-                            required>
+  const pan =
+    document.getElementById("pan").value
+      .trim()
+      .toUpperCase();
 
-                        <div class="error-message"></div>
+  const bankName =
+    document.getElementById("bankName").value.trim();
 
-                    </div>
+  const account =
+    document.getElementById("accountNumber").value.trim();
 
+  const ifsc =
+    document.getElementById("ifsc").value
+      .trim()
+      .toUpperCase();
 
-                    <div class="form-grid two-columns">
 
-                        <div class="input-group">
+  /* NAME */
 
-                            <label for="accountNumber">
-                                Account Number
-                            </label>
+  if (!name) {
 
-                            <input
-                                id="accountNumber"
-                                name="accountNumber"
-                                type="text"
-                                inputmode="numeric"
-                                autocomplete="off"
-                                maxlength="18"
-                                placeholder="9–18 digit account number"
-                                required>
+    document.getElementById("nameError").textContent =
+      "Name is required.";
 
-                            <div class="error-message"></div>
+    valid = false;
 
-                        </div>
+  }
 
 
-                        <div class="input-group">
+  /* PHONE */
 
-                            <label for="ifsc">
-                                IFSC Code
-                            </label>
+  if (!/^[6-9]\d{9}$/.test(phone)) {
 
-                            <input
-                                id="ifsc"
-                                name="ifsc"
-                                type="text"
-                                autocomplete="off"
-                                maxlength="11"
-                                placeholder="e.g. HDFC0001234"
-                                required>
+    document.getElementById("phoneError").textContent =
+      "Enter a valid 10-digit Indian mobile number.";
 
-                            <div class="error-message"></div>
+    valid = false;
 
-                        </div>
+  }
 
-                    </div>
 
+  /* EMAIL */
 
-                    <div class="form-grid two-columns">
+  if (
+    !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+  ) {
 
-                        <div class="input-group">
+    document.getElementById("emailError").textContent =
+      "Enter a valid email address.";
 
-                            <label for="accountType">
-                                Account Type
-                            </label>
+    valid = false;
 
-                            <select
-                                id="accountType"
-                                name="accountType"
-                                required>
+  }
 
-                                <option value="">
-                                    Select account type
-                                </option>
 
-                                <option value="Savings">
-                                    Savings
-                                </option>
+  /* ADDRESS */
 
-                                <option value="Current">
-                                    Current
-                                </option>
+  if (!address) {
 
-                            </select>
+    document.getElementById("addressError").textContent =
+      "Billing address is required.";
 
-                            <div class="error-message"></div>
+    valid = false;
 
-                        </div>
+  }
 
 
-                        <div class="input-group">
+  /* CAMPAIGN */
 
-                            <label for="pan">
-                                PAN
-                            </label>
+  if (
+    campaign === "" ||
+    !campaigns[campaign]
+  ) {
 
-                            <input
-                                id="pan"
-                                name="pan"
-                                type="text"
-                                autocomplete="off"
-                                maxlength="10"
-                                placeholder="ABCDE1234F"
-                                required>
+    document.getElementById("campaignError").textContent =
+      "Please select a campaign.";
 
-                            <div class="error-message"></div>
+    valid = false;
 
-                        </div>
+  }
 
-                    </div>
 
-                </section>
+  /* QTY */
 
+  if (!qty || qty < 1) {
 
+    document.getElementById("qtyError").textContent =
+      "Enter a valid quantity.";
 
-                <!-- =================================================
-                     SUBMIT
-                ================================================== -->
+    valid = false;
 
-                <div class="form-actions">
+  }
 
-                    <button
-                        id="generateBtn"
-                        type="submit"
-                        class="primary-button">
 
-                        Generate Invoice
+  /* DATE */
 
-                        <span>
-                            →
-                        </span>
+  if (!billingDate) {
 
-                    </button>
+    document.getElementById("dateError").textContent =
+      "Billing date is required.";
 
-                </div>
+    valid = false;
 
+  }
 
-                <p class="privacy-note">
-                    Your information is used only to generate the invoice.
-                </p>
 
-            </form>
+  /* PAN */
 
-        </div>
+  if (!/^[A-Z]{5}[0-9]{4}[A-Z]$/.test(pan)) {
 
-    </main>
+    document.getElementById("panError").textContent =
+      "Enter a valid PAN number.";
 
+    valid = false;
 
+  }
 
-    <!-- =====================================================
-         PREVIEW PAGE
-    ====================================================== -->
 
-    <main
-        id="previewPage"
-        class="preview-page hidden">
+  /* BANK */
 
+  if (!bankName) {
 
-        <div class="preview-header">
+    document.getElementById("bankNameError").textContent =
+      "Bank name is required.";
 
-            <div>
+    valid = false;
 
-                <div class="brand-mark">
-                    Under25
-                </div>
+  }
 
-                <h1>
-                    Invoice Preview
-                </h1>
 
-                <p>
-                    Review your invoice before downloading it.
-                </p>
+  /* ACCOUNT */
 
-            </div>
+  if (!/^\d{9,18}$/.test(account)) {
 
+    document.getElementById("accountError").textContent =
+      "Enter a valid bank account number.";
 
-            <div class="preview-actions desktop-actions">
+    valid = false;
 
-                <button
-                    id="editBtnTop"
-                    type="button"
-                    class="secondary-button">
+  }
 
-                    ← Edit Details
 
-                </button>
+  /* IFSC */
 
-                <button
-                    id="downloadBtnTop"
-                    type="button"
-                    class="primary-button">
+  if (!/^[A-Z]{4}0[A-Z0-9]{6}$/.test(ifsc)) {
 
-                    Download PDF
-                    ↓
+    document.getElementById("ifscError").textContent =
+      "Enter a valid IFSC code.";
 
-                </button>
+    valid = false;
 
-            </div>
+  }
 
-        </div>
 
+  /* SIGNATURE */
 
+  if (!signatureData) {
 
-        <!-- =================================================
-             MOBILE-SAFE A4 PREVIEW WRAPPER
-        ================================================== -->
+    document.getElementById("signatureError").textContent =
+      "Please upload your signature.";
 
-        <div
-            id="invoiceViewport"
-            class="invoice-viewport">
+    valid = false;
 
-            <div
-                id="invoiceScaleWrapper"
-                class="invoice-scale-wrapper">
+  }
 
-                <article
-                    id="invoicePaper"
-                    class="invoice-paper">
 
+  return valid;
 
-                    <!-- TOP RED BAR -->
+}
 
-                    <div class="invoice-red-bar"></div>
 
+/* =========================
+   GENERATE INVOICE
+========================= */
 
-                    <!-- MAIN CONTENT -->
+function generateInvoice() {
 
-                    <div class="invoice-content">
+  if (!validateForm()) {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth"
+    });
+    return;
+  }
 
 
-                        <!-- HEADER -->
+  const campaignIndex =
+    document.getElementById("campaign").value;
 
-                        <section class="invoice-header">
+  const campaign =
+    campaigns[campaignIndex];
 
-                            <div>
+  const name =
+    document.getElementById("name").value.trim();
 
-                                <h2>
-                                    INVOICE
-                                </h2>
+  const phone =
+    document.getElementById("phone").value.trim();
 
-                                <div class="invoice-meta">
+  const email =
+    document.getElementById("email").value.trim();
 
-                                    <div>
-                                        Invoice Number:
-                                        <span id="previewInvoiceNumber">
-                                            #
-                                        </span>
-                                    </div>
+  const address =
+    document.getElementById("address").value.trim();
 
-                                    <div>
-                                        Invoice Date:
-                                        <span id="previewInvoiceDate">
-                                        </span>
-                                    </div>
+  const qty =
+    Number(document.getElementById("qty").value);
 
-                                </div>
+  const billingDate =
+    document.getElementById("billingDate").value;
 
-                            </div>
+  const pan =
+    document.getElementById("pan").value
+      .trim()
+      .toUpperCase();
 
-                        </section>
+  const bankName =
+    document.getElementById("bankName").value.trim();
 
+  const account =
+    document.getElementById("accountNumber").value.trim();
 
+  const ifsc =
+    document.getElementById("ifsc").value
+      .trim()
+      .toUpperCase();
 
-                        <!-- BILL TO -->
+  const rate =
+    Number(campaign.rate);
 
-                        <section class="bill-to">
+  const total =
+    qty * rate;
 
-                            <h3>
-                                BILL TO
-                            </h3>
 
-                            <strong>
-                                Collective Artists Network India Pvt Ltd
-                            </strong>
+  /* PERSONAL */
 
-                            <div>
-    <strong>Address:</strong>
-    5th Floor, Lotus Business Park, New Link Road,<br>
-    Andheri West, Mumbai, Maharashtra – 400053
-</div>
+  document.getElementById("previewName").textContent =
+    name;
 
-                            <div>
-                                <strong>GSTIN:</strong>
-                                27AAHCP2434K1Z9
-                            </div>
+  document.getElementById("previewPhone").textContent =
+    phone;
 
-                            <div>
-                                <strong>PAN:</strong>
-                                AAHCP2434K
-                            </div>
+  document.getElementById("previewEmail").textContent =
+    email;
 
-                        </section>
+  document.getElementById("previewAddress").textContent =
+    address;
 
 
+  /* DATE */
 
-                        <!-- ITEM TABLE -->
+  document.getElementById("previewDate").textContent =
+    formatDate(billingDate);
 
-                        <section class="invoice-table-wrapper">
 
-                            <table class="invoice-table">
+  /* CAMPAIGN */
 
-                                <thead>
+  document.getElementById("previewCampaign").textContent =
+    campaign.name;
 
-                                    <tr>
+  document.getElementById("previewQty").textContent =
+    qty;
 
-                                        <th class="description-column">
-                                            Item &amp; Description
-                                        </th>
+  document.getElementById("previewRate").textContent =
+    formatCurrency(rate);
 
-                                        <th class="price-column">
-                                            Unit Price
-                                        </th>
+  document.getElementById("previewAmount").textContent =
+    formatCurrency(total);
 
-                                        <th class="qty-column">
-                                            Qty
-                                        </th>
+  document.getElementById("previewSubtotal").textContent =
+    formatCurrency(total);
 
-                                        <th class="amount-column">
-                                            Amount
-                                        </th>
+  document.getElementById("previewTotal").textContent =
+    formatCurrency(total);
 
-                                    </tr>
 
-                                </thead>
+  /* BANK */
 
+  document.getElementById("previewPan").textContent =
+    pan;
 
-                                <tbody>
+  document.getElementById("previewBank").textContent =
+    bankName;
 
-                                    <tr>
+  document.getElementById("previewAccount").textContent =
+    account;
 
-                                        <td id="previewItem">
-                                            Instagram Reel
-                                        </td>
+  document.getElementById("previewIfsc").textContent =
+    ifsc;
 
-                                        <td>
-                                            <span class="currency">
-                                                ₹
-                                            </span>
 
-                                            <span id="previewUnitPrice">
-                                                0
-                                            </span>
-                                        </td>
+  document.getElementById("previewPan2").textContent =
+    pan;
 
-                                        <td id="previewQuantity">
-                                            1
-                                        </td>
+  document.getElementById("previewBank2").textContent =
+    bankName;
 
-                                        <td>
-                                            <span class="currency">
-                                                ₹
-                                            </span>
+  document.getElementById("previewAccount2").textContent =
+    account;
 
-                                            <span id="previewAmount">
-                                                0
-                                            </span>
-                                        </td>
+  document.getElementById("previewIfsc2").textContent =
+    ifsc;
 
-                                    </tr>
 
-                                </tbody>
+  /* SIGNATURE */
 
-                            </table>
+  document.getElementById("previewSignature").src =
+    signatureData;
 
-                        </section>
 
+  /* SHOW PREVIEW */
 
+  document.getElementById("formSection").style.display =
+    "none";
 
-                        <!-- TOTAL -->
+  document.getElementById("previewSection").style.display =
+    "block";
 
-                        <section class="invoice-total">
 
-                            <div class="total-label">
-                                Total
-                            </div>
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
-                            <div class="total-value">
+}
 
-                                <span>
-                                    ₹
-                                </span>
 
-                                <span id="previewTotal">
-                                    0
-                                </span>
+/* =========================
+   EDIT
+========================= */
 
-                            </div>
+function editInvoice() {
 
-                        </section>
+  document.getElementById("previewSection").style.display =
+    "none";
 
+  document.getElementById("formSection").style.display =
+    "block";
 
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 
-                        <!-- BOTTOM INFORMATION -->
+}
 
-                        <section class="invoice-bottom">
 
+/* =========================
+   DATE FORMAT
+========================= */
 
-                            <!-- PAYMENT METHOD -->
+function formatDate(dateString) {
 
-                            <div class="payment-details">
+  const date =
+    new Date(dateString + "T00:00:00");
 
-                                <h3>
-                                    PAYMENT METHOD
-                                </h3>
+  return date.toLocaleDateString("en-IN", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric"
+  });
 
-                                <div>
-                                    <span>Bank:</span>
-                                    <strong id="previewBank">
-                                    </strong>
-                                </div>
+}
 
-                                <div>
-                                    <span>Account Name:</span>
-                                    <strong id="previewAccountName">
-                                    </strong>
-                                </div>
 
-                                <div>
-                                    <span>Account Number:</span>
-                                    <strong id="previewAccountNumber">
-                                    </strong>
-                                </div>
+/* =========================
+   DOWNLOAD PDF
+========================= */
 
-                                <div>
-                                    <span>IFSC Code:</span>
-                                    <strong id="previewIfsc">
-                                    </strong>
-                                </div>
+async function downloadPDF() {
 
-                                <div>
-                                    <span>Account Type:</span>
-                                    <strong id="previewAccountType">
-                                    </strong>
-                                </div>
+  const invoice =
+    document.getElementById("invoice");
 
-                                <div>
-                                    <span>PAN:</span>
-                                    <strong id="previewPan">
-                                    </strong>
-                                </div>
+  const button =
+    event.target;
 
-                            </div>
+  const originalText =
+    button.textContent;
 
+  button.textContent =
+    "Generating PDF...";
 
+  button.disabled = true;
 
-                            <!-- CREATOR DETAILS -->
 
-                            <div class="creator-details">
+  try {
 
-                                <h3 id="previewCreatorName">
-                                    YOUR NAME
-                                </h3>
+    const canvas =
+      await html2canvas(invoice, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: "#ffffff"
+      });
 
 
-                                <div class="creator-line">
+    const imgData =
+      canvas.toDataURL("image/jpeg", 0.95);
 
-                                    <strong>
-                                        Address:
-                                    </strong>
 
-                                    <span id="previewCreatorAddress">
-                                    </span>
+    const {
+      jsPDF
+    } = window.jspdf;
 
-                                </div>
 
+    const pdf =
+      new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4"
+      });
 
-                                <div class="creator-line">
 
-                                    <strong>
-                                        Number:
-                                    </strong>
+    const pageWidth =
+      pdf.internal.pageSize.getWidth();
 
-                                    <span id="previewCreatorPhone">
-                                    </span>
+    const pageHeight =
+      pdf.internal.pageSize.getHeight();
 
-                                </div>
 
+    const imgWidth =
+      pageWidth;
 
-                                <div class="creator-line">
+    const imgHeight =
+      canvas.height * imgWidth / canvas.width;
 
-                                    <strong>
-                                        Email:
-                                    </strong>
 
-                                    <span id="previewCreatorEmail">
-                                    </span>
+    let heightLeft =
+      imgHeight;
 
-                                </div>
+    let position = 0;
 
-                            </div>
 
+    pdf.addImage(
+      imgData,
+      "JPEG",
+      0,
+      position,
+      imgWidth,
+      imgHeight
+    );
 
-                        </section>
 
-                    </div>
+    heightLeft -= pageHeight;
 
 
-                    <!-- BOTTOM RED BAR -->
+    while (heightLeft > 0) {
 
-                    <div class="invoice-red-bar bottom-bar"></div>
+      position =
+        heightLeft - imgHeight;
 
-                </article>
+      pdf.addPage();
 
-            </div>
+      pdf.addImage(
+        imgData,
+        "JPEG",
+        0,
+        position,
+        imgWidth,
+        imgHeight
+      );
 
-        </div>
+      heightLeft -= pageHeight;
 
+    }
 
 
-        <!-- MOBILE ACTIONS -->
+    const name =
+      document.getElementById("name").value
+        .trim()
+        .replace(/\s+/g, "-")
+        .toLowerCase();
 
-        <div class="preview-actions mobile-actions">
 
-            <button
-                id="editBtn"
-                type="button"
-                class="secondary-button">
+    pdf.save(
+      `invoice-${name || "under25"}.pdf`
+    );
 
-                ← Edit Details
 
-            </button>
+  } catch (error) {
 
-            <button
-                id="downloadBtn"
-                type="button"
-                class="primary-button">
+    alert(
+      "Unable to generate PDF. Please try again."
+    );
 
-                Download Invoice PDF
-                ↓
+    console.error(error);
 
-            </button>
+  }
 
-        </div>
 
+  button.textContent =
+    originalText;
 
-        <p class="pdf-note">
-            The downloaded invoice will be generated as a full A4 PDF.
-        </p>
+  button.disabled = false;
 
-    </main>
+}
 
-
-
-    <!-- =====================================================
-         PDF LIBRARIES
-    ====================================================== -->
-
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
-    </script>
-
-    <script
-        src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
-    </script>
-
-
-    <!-- =====================================================
-         PAGE JAVASCRIPT
-    ====================================================== -->
-
-    <script src="../js/invoice-gen.js"></script>
+</script>
 
 </body>
-
 </html>
