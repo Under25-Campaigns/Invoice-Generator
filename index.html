@@ -245,7 +245,9 @@
     }
 
 
-    /* Invoice Header */
+    /* =========================================================
+       INVOICE HEADER
+    ========================================================= */
 
     .invoice-top {
       display: flex;
@@ -274,13 +276,22 @@
       font-size: 30px;
     }
 
-    .invoice-title p {
-      margin: 7px 0 0;
+    .invoice-number {
+      margin: 8px 0 0;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .invoice-date {
+      margin: 5px 0 0;
+      color: #666;
       font-size: 13px;
     }
 
 
-    /* Invoice Sections */
+    /* =========================================================
+       INVOICE SECTIONS
+    ========================================================= */
 
     .invoice-section {
       margin-top: 30px;
@@ -295,7 +306,9 @@
     }
 
 
-    /* Billing Details */
+    /* =========================================================
+       BILLING DETAILS
+    ========================================================= */
 
     .invoice-details {
       display: grid;
@@ -310,7 +323,9 @@
     }
 
 
-    /* Invoice Table */
+    /* =========================================================
+       INVOICE TABLE
+    ========================================================= */
 
     .invoice-table {
       width: 100%;
@@ -337,7 +352,9 @@
     }
 
 
-    /* Total */
+    /* =========================================================
+       TOTAL
+    ========================================================= */
 
     .total-box {
       width: 300px;
@@ -361,7 +378,9 @@
     }
 
 
-    /* Bank Details */
+    /* =========================================================
+       BANK DETAILS
+    ========================================================= */
 
     .bank-section {
       margin-top: 45px;
@@ -381,7 +400,9 @@
     }
 
 
-    /* Signature */
+    /* =========================================================
+       SIGNATURE
+    ========================================================= */
 
     .signature-area {
       margin-top: 50px;
@@ -516,8 +537,15 @@
 ======================================================== -->
 
 <header class="header">
-  <h1>Invoice Generator</h1>
-  <p>Generate your invoice in a few simple steps.</p>
+
+  <h1>
+    Invoice Generator
+  </h1>
+
+  <p>
+    Generate your invoice in a few simple steps.
+  </p>
+
 </header>
 
 
@@ -534,14 +562,20 @@
 
   <div class="card">
 
-    <h2>1. Personal Details</h2>
+    <h2>
+      1. Personal Details
+    </h2>
 
     <div class="grid">
 
-      <!-- Name -->
+
+      <!-- NAME -->
 
       <div>
-        <label for="name">Name</label>
+
+        <label for="name">
+          Name
+        </label>
 
         <input
           type="text"
@@ -553,13 +587,17 @@
           class="error"
           id="nameError"
         ></div>
+
       </div>
 
 
-      <!-- Phone -->
+      <!-- PHONE -->
 
       <div>
-        <label for="phone">Number</label>
+
+        <label for="phone">
+          Number
+        </label>
 
         <input
           type="tel"
@@ -573,13 +611,17 @@
           class="error"
           id="phoneError"
         ></div>
+
       </div>
 
 
-      <!-- Email -->
+      <!-- EMAIL -->
 
       <div>
-        <label for="email">Email</label>
+
+        <label for="email">
+          Email
+        </label>
 
         <input
           type="email"
@@ -591,10 +633,11 @@
           class="error"
           id="emailError"
         ></div>
+
       </div>
 
 
-      <!-- Billing Address -->
+      <!-- ADDRESS -->
 
       <div class="full">
 
@@ -625,11 +668,14 @@
 
   <div class="card">
 
-    <h2>2. Campaign Details</h2>
+    <h2>
+      2. Campaign Details
+    </h2>
 
     <div class="grid">
 
-      <!-- Campaign -->
+
+      <!-- CAMPAIGN -->
 
       <div class="full">
 
@@ -665,7 +711,7 @@
       </div>
 
 
-      <!-- Quantity -->
+      <!-- QUANTITY -->
 
       <div>
 
@@ -689,7 +735,7 @@
       </div>
 
 
-      <!-- Rate -->
+      <!-- RATE -->
 
       <div>
 
@@ -713,7 +759,7 @@
       </div>
 
 
-      <!-- Calculated Amount -->
+      <!-- CALCULATED AMOUNT -->
 
       <div>
 
@@ -736,7 +782,7 @@
       </div>
 
 
-      <!-- Billing Date -->
+      <!-- BILLING DATE -->
 
       <div>
 
@@ -767,9 +813,12 @@
 
   <div class="card">
 
-    <h2>3. Bank Details</h2>
+    <h2>
+      3. Bank Details
+    </h2>
 
     <div class="grid">
+
 
       <!-- PAN -->
 
@@ -795,7 +844,7 @@
       </div>
 
 
-      <!-- Bank Name -->
+      <!-- BANK NAME -->
 
       <div>
 
@@ -817,7 +866,7 @@
       </div>
 
 
-      <!-- Account Number -->
+      <!-- ACCOUNT NUMBER -->
 
       <div>
 
@@ -874,7 +923,9 @@
 
   <div class="card">
 
-    <h2>4. Signature</h2>
+    <h2>
+      4. Signature
+    </h2>
 
     <label for="signature">
       Upload Signature
@@ -927,7 +978,9 @@
 
   <div class="card">
 
-    <h2>Invoice Preview</h2>
+    <h2>
+      Invoice Preview
+    </h2>
 
 
     <div class="preview-wrapper">
@@ -941,20 +994,39 @@
 
         <div class="invoice-top">
 
+
+          <!-- BRAND -->
+
           <div class="invoice-brand">
 
-            <h1>Under25</h1>
+            <h1>
+              Under25
+            </h1>
 
-            <p>Invoice</p>
+            <p>
+              Invoice
+            </p>
 
           </div>
 
 
+          <!-- INVOICE INFORMATION -->
+
           <div class="invoice-title">
 
-            <h2>INVOICE</h2>
+            <h2>
+              INVOICE
+            </h2>
 
-            <p id="previewDate"></p>
+            <p class="invoice-number">
+              Invoice No:
+              <span id="previewInvoiceNumber"></span>
+            </p>
+
+            <p
+              class="invoice-date"
+              id="previewDate"
+            ></p>
 
           </div>
 
@@ -1138,7 +1210,6 @@
             Bank Details
           </div>
 
-
           <div class="bank-grid">
 
             <p>
@@ -1230,6 +1301,62 @@
 
     let signatureData = "";
 
+    let currentInvoiceNumber = "";
+
+
+    /* =========================================================
+       INVOICE NUMBER
+    ========================================================= */
+
+    function generateInvoiceNumber() {
+
+      const now = new Date();
+
+      const year =
+        now.getFullYear();
+
+      const month =
+        String(now.getMonth() + 1)
+          .padStart(2, "0");
+
+      const day =
+        String(now.getDate())
+          .padStart(2, "0");
+
+
+      const storageKey =
+        "under25_invoice_counter_" +
+        year +
+        month +
+        day;
+
+
+      let counter =
+        Number(
+          localStorage.getItem(storageKey)
+        ) || 0;
+
+
+      counter += 1;
+
+
+      localStorage.setItem(
+        storageKey,
+        counter
+      );
+
+
+      return (
+        "U25-" +
+        year +
+        month +
+        day +
+        "-" +
+        String(counter).padStart(4, "0")
+      );
+
+    }
+
 
     /* =========================================================
        AMOUNT CALCULATION
@@ -1237,24 +1364,37 @@
 
     document
       .getElementById("qty")
-      .addEventListener("input", updateAmount);
+      .addEventListener(
+        "input",
+        updateAmount
+      );
+
 
     document
       .getElementById("rate")
-      .addEventListener("input", updateAmount);
+      .addEventListener(
+        "input",
+        updateAmount
+      );
 
 
     function updateAmount() {
 
       const qty =
         Number(
-          document.getElementById("qty").value
+          document
+            .getElementById("qty")
+            .value
         ) || 0;
+
 
       const rate =
         Number(
-          document.getElementById("rate").value
+          document
+            .getElementById("rate")
+            .value
         ) || 0;
+
 
       const total =
         qty * rate;
@@ -1262,7 +1402,9 @@
 
       document
         .getElementById("calculatedAmount")
-        .textContent = formatCurrency(total);
+        .textContent =
+        formatCurrency(total);
+
     }
 
 
@@ -1273,10 +1415,14 @@
     function formatCurrency(amount) {
 
       return "₹" +
-        Number(amount).toLocaleString("en-IN", {
-          minimumFractionDigits: 2,
-          maximumFractionDigits: 2
-        });
+        Number(amount).toLocaleString(
+          "en-IN",
+          {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+          }
+        );
+
     }
 
 
@@ -1293,15 +1439,20 @@
           const file =
             event.target.files[0];
 
+
           if (!file) {
             return;
           }
 
 
-          if (!file.type.startsWith("image/")) {
+          if (
+            !file.type.startsWith("image/")
+          ) {
 
             document
-              .getElementById("signatureError")
+              .getElementById(
+                "signatureError"
+              )
               .textContent =
               "Please upload an image only.";
 
@@ -1321,13 +1472,15 @@
 
 
               const preview =
-                document.getElementById(
-                  "signaturePreview"
-                );
+                document
+                  .getElementById(
+                    "signaturePreview"
+                  );
 
 
               preview.src =
                 signatureData;
+
 
               preview.style.display =
                 "block";
@@ -1467,12 +1620,15 @@
           "Name is required.";
 
         valid = false;
+
       }
 
 
       /* PHONE */
 
-      if (!/^[6-9]\d{9}$/.test(phone)) {
+      if (
+        !/^[6-9]\d{9}$/.test(phone)
+      ) {
 
         document
           .getElementById("phoneError")
@@ -1480,6 +1636,7 @@
           "Enter a valid 10-digit Indian mobile number.";
 
         valid = false;
+
       }
 
 
@@ -1495,6 +1652,7 @@
           "Enter a valid email address.";
 
         valid = false;
+
       }
 
 
@@ -1508,6 +1666,7 @@
           "Billing address is required.";
 
         valid = false;
+
       }
 
 
@@ -1521,6 +1680,7 @@
           "Please select a campaign.";
 
         valid = false;
+
       }
 
 
@@ -1537,6 +1697,7 @@
           "Enter a valid quantity.";
 
         valid = false;
+
       }
 
 
@@ -1553,6 +1714,7 @@
           "Enter a valid rate.";
 
         valid = false;
+
       }
 
 
@@ -1566,6 +1728,7 @@
           "Billing date is required.";
 
         valid = false;
+
       }
 
 
@@ -1581,6 +1744,7 @@
           "Enter a valid PAN number.";
 
         valid = false;
+
       }
 
 
@@ -1594,6 +1758,7 @@
           "Bank name is required.";
 
         valid = false;
+
       }
 
 
@@ -1609,6 +1774,7 @@
           "Enter a valid bank account number.";
 
         valid = false;
+
       }
 
 
@@ -1624,6 +1790,7 @@
           "Enter a valid IFSC code.";
 
         valid = false;
+
       }
 
 
@@ -1637,10 +1804,12 @@
           "Please upload your signature.";
 
         valid = false;
+
       }
 
 
       return valid;
+
     }
 
 
@@ -1658,6 +1827,7 @@
         });
 
         return;
+
       }
 
 
@@ -1751,26 +1921,49 @@
         qty * rate;
 
 
+      /*
+        Generate the invoice number only
+        when the invoice is actually generated.
+      */
+
+      currentInvoiceNumber =
+        generateInvoiceNumber();
+
+
       /* Personal Details */
 
       document
         .getElementById("previewName")
-        .textContent = name;
+        .textContent =
+        name;
 
 
       document
         .getElementById("previewPhone")
-        .textContent = phone;
+        .textContent =
+        phone;
 
 
       document
         .getElementById("previewEmail")
-        .textContent = email;
+        .textContent =
+        email;
 
 
       document
         .getElementById("previewAddress")
-        .textContent = address;
+        .textContent =
+        address;
+
+
+      /* Invoice Number */
+
+      document
+        .getElementById(
+          "previewInvoiceNumber"
+        )
+        .textContent =
+        currentInvoiceNumber;
 
 
       /* Billing Date */
@@ -1785,12 +1978,14 @@
 
       document
         .getElementById("previewCampaign")
-        .textContent = campaign;
+        .textContent =
+        campaign;
 
 
       document
         .getElementById("previewQty")
-        .textContent = qty;
+        .textContent =
+        qty;
 
 
       document
@@ -1821,41 +2016,48 @@
 
       document
         .getElementById("previewPan")
-        .textContent = pan;
+        .textContent =
+        pan;
 
 
       document
         .getElementById("previewBank")
-        .textContent = bankName;
+        .textContent =
+        bankName;
 
 
       document
         .getElementById("previewAccount")
-        .textContent = account;
+        .textContent =
+        account;
 
 
       document
         .getElementById("previewIfsc")
-        .textContent = ifsc;
+        .textContent =
+        ifsc;
 
 
       /* Signature */
 
       document
         .getElementById("previewSignature")
-        .src = signatureData;
+        .src =
+        signatureData;
 
 
       /* Switch to Preview */
 
       document
         .getElementById("formSection")
-        .style.display = "none";
+        .style.display =
+        "none";
 
 
       document
         .getElementById("previewSection")
-        .style.display = "block";
+        .style.display =
+        "block";
 
 
       window.scrollTo({
@@ -1874,12 +2076,14 @@
 
       document
         .getElementById("previewSection")
-        .style.display = "none";
+        .style.display =
+        "none";
 
 
       document
         .getElementById("formSection")
-        .style.display = "block";
+        .style.display =
+        "block";
 
 
       window.scrollTo({
@@ -1921,7 +2125,9 @@
     async function downloadPDF() {
 
       const invoice =
-        document.getElementById("invoice");
+        document.getElementById(
+          "invoice"
+        );
 
 
       const button =
@@ -2035,17 +2241,15 @@
         }
 
 
-        const name =
-          document
-            .getElementById("name")
-            .value
-            .trim()
-            .replace(/\s+/g, "-")
-            .toLowerCase();
+        /*
 
+          Use the invoice number in
+          the downloaded filename.
+
+        */
 
         pdf.save(
-          `invoice-${name || "under25"}.pdf`
+          `${currentInvoiceNumber}.pdf`
         );
 
 
