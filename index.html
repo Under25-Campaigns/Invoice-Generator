@@ -476,51 +476,60 @@
         overflow-x: hidden;
       }
 
+      /*
+        IMPORTANT:
+        Keep the invoice itself at true A4 dimensions on mobile.
+        Only the on-screen preview is scaled visually.
+      */
+
       #invoice {
-        width: 100%;
-        min-height: auto;
-        padding: 25px 18px;
+        width: 794px;
+        min-width: 794px;
+        height: 1123px;
+        min-height: 1123px;
+        padding: 50px;
+        transform-origin: top left;
       }
 
       .invoice-top {
-        flex-direction: column;
-        gap: 20px;
+        flex-direction: row;
+        gap: 30px;
       }
 
       .invoice-title {
-        text-align: left;
+        text-align: right;
       }
 
       .invoice-title h2 {
-        font-size: 25px;
+        font-size: 30px;
       }
 
       .invoice-details {
-        grid-template-columns: 1fr;
-        gap: 18px;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
       }
 
       .invoice-table th,
       .invoice-table td {
-        padding: 9px 6px;
-        font-size: 12px;
+        padding: 12px;
+        font-size: 13px;
       }
 
       .total-box {
-        width: 100%;
+        width: 300px;
       }
 
       .bank-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: 1fr 1fr;
       }
 
       .signature-area {
-        text-align: left;
+        text-align: right;
       }
 
       .signature-area img,
       .signature-line {
-        margin-left: 0;
+        margin-left: auto;
       }
     }
   </style>
@@ -2099,34 +2108,138 @@
 
 
     /* =========================================================
-       DOWNLOAD PDF
+       FIT A4 PREVIEW ON MOBILE
+    ========================================================= */
+
+    function fitInvoicePreview() {
+
+      const invoice =
+        document.getElementById("invoice");
+
+      const wrapper =
+        document.querySelector(".preview-wrapper");
+
+      if (window.innerWidth <= 650) {
+
+        /*
+          offsetWidth gives the REAL invoice width.
+          Do not use getBoundingClientRect() here because
+          that value is already affected by transform scaling.
+        */
+
+        const invoiceWidth =
+          invoice.offsetWidth;
+
+        const invoiceHeight =
+          invoice.offsetHeight;
+
+        const availableWidth =
+          wrapper.clientWidth;
+
+        const scale =
+          Math.min(
+            1,
+            availableWidth / invoiceWidth
+          );
+
+        invoice.style.transform =
+          `scale(${scale})`;
+
+        invoice.style.transformOrigin =
+          "top left";
+
+        wrapper.style.height =
+          (invoiceHeight * scale) + "px";
+
+      } else {
+
+        invoice.style.transform =
+          "none";
+
+        wrapper.style.height =
+          "auto";
+
+      }
+
+    }
+
+
+    window.addEventListener(
+      "resize",
+      fitInvoicePreview
+    );
+
+
+    /* =========================================================
+       DOWNLOAD SINGLE-PAGE A4 PDF
     ========================================================= */
 
     async function downloadPDF() {
 
       const invoice =
-        document.getElementById(
-          "invoice"
-        );
-
+        document.getElementById("invoice");
 
       const button =
-        document.getElementById(
-          "downloadButton"
-        );
-
+        document.getElementById("downloadButton");
 
       const originalText =
         button.textContent;
 
+      const originalTransform =
+        invoice.style.transform;
+
+      const originalTransformOrigin =
+        invoice.style.transformOrigin;
 
       button.textContent =
         "Generating PDF...";
 
-      button.disabled = true;
-
+      button.disabled =
+        true;
 
       try {
+
+        /*
+          The invoice is ALWAYS:
+          794px x 1123px
+
+          This is the CSS equivalent of:
+          210mm x 297mm
+
+          Remove the mobile preview transform before capture.
+        */
+
+        invoice.style.transform =
+          "none";
+
+        invoice.style.transformOrigin =
+          "top left";
+
+        /*
+          Wait for the browser to render
+          the unscaled A4 invoice.
+        */
+
+        await new Promise(
+          function(resolve) {
+
+            requestAnimationFrame(
+              function() {
+
+                requestAnimationFrame(
+                  resolve
+                );
+
+              }
+            );
+
+          }
+        );
+
+
+        /*
+          Capture ONLY the A4 invoice.
+        */
 
         const canvas =
           await html2canvas(
@@ -2134,9 +2247,28 @@
             {
               scale: 2,
               useCORS: true,
-              backgroundColor: "#ffffff"
+              backgroundColor: "#ffffff",
+              width: 794,
+              height: 1123,
+              windowWidth: 794,
+              windowHeight: 1123,
+              scrollX: 0,
+              scrollY: 0
             }
           );
+
+
+        /*
+          Restore the mobile preview.
+        */
+
+        invoice.style.transform =
+          originalTransform;
+
+        invoice.style.transformOrigin =
+          originalTransformOrigin;
+
+        fitInvoicePreview();
 
 
         const imgData =
@@ -2151,81 +2283,46 @@
         } = window.jspdf;
 
 
+        /*
+          Create EXACTLY ONE A4 page.
+        */
+
         const pdf =
           new jsPDF({
             orientation: "portrait",
             unit: "mm",
-            format: "a4"
+            format: "a4",
+            compress: true
           });
 
 
-        const pageWidth =
-          pdf.internal.pageSize.getWidth();
+        /*
+          A4 dimensions:
+          210mm x 297mm
 
+          The image is placed exactly once,
+          covering the entire A4 page.
 
-        const pageHeight =
-          pdf.internal.pageSize.getHeight();
-
-
-        const imgWidth =
-          pageWidth;
-
-
-        const imgHeight =
-          canvas.height *
-          imgWidth /
-          canvas.width;
-
-
-        let heightLeft =
-          imgHeight;
-
-
-        let position = 0;
-
+          IMPORTANT:
+          There is intentionally NO addPage()
+          and NO multipage loop.
+        */
 
         pdf.addImage(
           imgData,
           "JPEG",
           0,
-          position,
-          imgWidth,
-          imgHeight
+          0,
+          210,
+          297,
+          undefined,
+          "FAST"
         );
 
 
-        heightLeft -= pageHeight;
-
-
-        while (heightLeft > 0) {
-
-          position =
-            heightLeft - imgHeight;
-
-
-          pdf.addPage();
-
-
-          pdf.addImage(
-            imgData,
-            "JPEG",
-            0,
-            position,
-            imgWidth,
-            imgHeight
-          );
-
-
-          heightLeft -= pageHeight;
-
-        }
-
-
         /*
-
-          Use the invoice number in
-          the downloaded filename.
-
+          Keep the existing invoice number
+          as the filename.
         */
 
         pdf.save(
@@ -2237,6 +2334,18 @@
 
         console.error(error);
 
+        /*
+          Always restore the preview if PDF generation fails.
+        */
+
+        invoice.style.transform =
+          originalTransform;
+
+        invoice.style.transformOrigin =
+          originalTransformOrigin;
+
+        fitInvoicePreview();
+
         alert(
           "Unable to generate PDF. Please try again."
         );
@@ -2247,10 +2356,10 @@
       button.textContent =
         originalText;
 
-      button.disabled = false;
+      button.disabled =
+        false;
 
     }
-
   </script>
 
 </body>
